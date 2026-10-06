@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Архитектура и логистика данных // ПАК Театральной студии</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Clean scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Transitions & dimming states */
+    .arch-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: default; /* Cards are purely visual display, no clicks */
+    }
+    .arch-card:hover {
+      transform: translateY(-1px);
+    }
+    .arch-card.dimmed {
+      opacity: 0.16;
+      filter: grayscale(85%);
+    }
+    .arch-card.active-focus {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.15), 0 3px 6px -2px rgba(79, 70, 229, 0.06);
+    }
+
+    /* Animated pulse along SVG arrows */
+    @keyframes dashMove {
+      from { stroke-dashoffset: 32; }
+      to { stroke-dashoffset: 0; }
+    }
+    .arrow-active {
+      stroke-dasharray: 6 6;
+      animation: dashMove 1.2s linear infinite;
+    }
+    .arrow-line {
+      transition: opacity 0.25s ease, stroke 0.25s ease, stroke-width 0.25s ease;
+    }
+
+    /* Crisp pulse for attention beacon (zero text scaling, zero blur) */
+    @keyframes beaconGlow {
+      0%, 100% { 
+        border-color: rgba(99, 102, 241, 0.35); 
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.25); 
+      }
+      50% { 
+        border-color: rgba(99, 102, 241, 0.85); 
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); 
+      }
+    }
+    .attention-beacon {
+      animation: beaconGlow 2.2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-indigo-600 selection:text-white">
+
+  <!-- ========================================================= -->
+  <!-- STRATEGIC MOBILE GATEKEEPER (EXECUTIVE BUSINESS CONTEXT)  -->
+  <!-- ========================================================= -->
+  <div id="mobile-gatekeeper" class="fixed inset-0 z-50 lg:hidden bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white">
+    <div class="max-w-md w-full p-6 sm:p-7 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-4">
+      
+      <!-- System Identity Badge -->
+      <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 mx-auto flex items-center justify-center shadow-inner">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3" />
+        </svg>
+      </div>
+
+      <!-- Project Context Header (Clear, executive, no micro-mechanics) -->
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-indigo-950/90 border border-indigo-700/60 text-indigo-300 font-mono text-[10px] font-bold uppercase tracking-wider">
+          <span>ПРОЕКТ: ЦИФРОВАЯ ТРАНСФОРМАЦИЯ СТУДИИ</span>
+        </div>
+        <h2 class="text-base sm:text-lg font-extrabold text-slate-100 mt-2.5 leading-snug">
+          Интерактивная архитектура данных студии
+        </h2>
+        <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+          Это приложение к коммерческому предложению по созданию программного комплекса студии. Схема демонстрирует, как ключевые процессы — отметка явки в зале, списание абонементов, еженедельная ценность для родителей и отчеты для собственника — связываются в единый автоматизированный контур без ручного труда.
+        </p>
+      </div>
+
+      <!-- Strategic Justification: Why Desktop is Vital -->
+      <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 text-left space-y-1.5 font-sans">
+        <div class="flex items-center gap-2 text-indigo-400 font-mono text-[11px] font-bold uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+          <span>Почему схему важно смотреть с компьютера:</span>
+        </div>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          На экране смартфона схема вынужденно вытягивается в длинную вертикальную колонку, из-за чего <strong class="text-slate-200">теряется сквозная картина взаимосвязей</strong>. 
+          На десктопе вы сможете интерактивно переключать 4 роли (педагог, администратор, родители, собственник) и наглядно увидеть, как исключение ручной рутины снимает барьер для роста студии <strong class="text-indigo-300">со 100 до 250+ учеников</strong>.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-1 flex flex-col gap-2">
+        <button onclick="dismissMobileGatekeeper()" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] text-white font-mono text-xs font-bold transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+          <span>Открыть структуру карточек на смартфоне</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <span class="text-[10px] font-mono text-slate-500">
+          (На мобильном доступен вертикальный просмотр узлов системы)
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="bg-white/95 backdrop-blur border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-col sm:flex-row items-center justify-between gap-2 py-2 sm:py-0">
+      
+      <!-- System Branding -->
+      <div class="flex items-center space-x-3 self-start sm:self-center">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-mono font-extrabold text-xs shadow-sm">
+          ПАК
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-slate-900 text-sm tracking-tight">АРХИТЕКТУРА И ЛОГИСТИКА ДАННЫХ</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-mono font-bold border border-indigo-200 uppercase">
+              КП // Студия
+            </span>
+          </div>
+          <!-- Explicit user guidance in subtext -->
+          <p class="text-[10px] text-indigo-600 font-mono font-semibold hidden md:block flex items-center gap-1">
+            <span>👆 Выберите роль (актора) справа для анализа потоков данных:</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Actor Route Switcher Buttons with Animated Attention Cue -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full sm:w-auto font-mono text-xs">
+        
+        <!-- Animated Attention Beacon (Crisp typography, no blur) -->
+        <div class="attention-beacon flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-50/80 border border-indigo-200 text-indigo-700 font-bold whitespace-nowrap shadow-xs">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-500 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+          </span>
+          <span class="text-[10px] tracking-wide uppercase font-extrabold">РОЛЬ:</span>
+        </div>
+
+        <button onclick="setActorRoute('all')" id="btn-actor-all" class="actor-btn px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-xs transition-all whitespace-nowrap">
+          Все связи
+        </button>
+        <button onclick="setActorRoute('teacher')" id="btn-actor-teacher" class="actor-btn px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 border border-slate-200 bg-white transition-all whitespace-nowrap">
+          1. Преподаватель
+        </button>
+        <button onclick="setActorRoute('admin')" id="btn-actor-admin" class="actor-btn px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 border border-slate-200 bg-white transition-all whitespace-nowrap">
+          2. Администратор
+        </button>
+        <button onclick="setActorRoute('parent')" id="btn-actor-parent" class="actor-btn px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 border border-slate-200 bg-white transition-all whitespace-nowrap">
+          3. Родители
+        </button>
+        <button onclick="setActorRoute('maxim')" id="btn-actor-maxim" class="actor-btn px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 border border-slate-200 bg-white transition-all whitespace-nowrap">
+          4. Собственник
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- MAIN INTERACTIVE ARCHITECTURE CANVAS -->
+    <div class="relative bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm overflow-hidden" id="diagram-container">
+      
+      <!-- Vector SVG Dynamic Connection Layer (Placed on top of panels, pointer-events none) -->
+      <svg id="arrow-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-30">
+        <defs>
+          <marker id="arrowhead-emerald" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#10b981" />
+          </marker>
+          <marker id="arrowhead-sky" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#0284c7" />
+          </marker>
+          <marker id="arrowhead-purple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#8b5cf6" />
+          </marker>
+          <marker id="arrowhead-rose" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#e11d48" />
+          </marker>
+          <marker id="arrowhead-amber" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#f59e0b" />
+          </marker>
+          <marker id="arrowhead-indigo" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#4f46e5" />
+          </marker>
+        </defs>
+
+        <!-- SVG Paths dynamically drawn by JS Controller -->
+        <g id="svg-paths-group"></g>
+      </svg>
+
+      <!-- ========================================================= -->
+      <!-- 3 EXPLICIT ARCHITECTURAL ZONES (GRID LAYOUT)              -->
+      <!-- ========================================================= -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 relative z-20">
+
+        <!-- ========================================================= -->
+        <!-- ZONE 1: ACTORS (LEFT, 3 COLS)                             -->
+        <!-- ========================================================= -->
+        <div class="lg:col-span-3 rounded-2xl bg-emerald-50/30 border-2 border-emerald-500/25 p-4 flex flex-col justify-between space-y-4">
+          
+          <!-- Zone 1 Header Badge -->
+          <div class="flex items-center justify-between pb-3 border-b border-emerald-200/60">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100"></span>
+              <span class="text-xs font-mono font-extrabold text-emerald-950 uppercase tracking-tight">01. АКТОРЫ СИСТЕМЫ</span>
+            </div>
+            <span class="text-[9px] font-mono font-bold bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+              СУБЪЕКТЫ
+            </span>
+          </div>
+
+          <!-- Actor Cards Stack -->
+          <div class="flex flex-col space-y-3.5 flex-1 justify-between">
+            
+            <!-- Actor 1: Teacher -->
+            <div id="card-actor-teacher" class="arch-card bg-white p-3.5 rounded-xl border border-emerald-300 shadow-xs hover:border-emerald-500">
+              <div class="flex items-center justify-between pb-1.5 border-b border-emerald-100">
+                <span class="text-[10px] font-mono font-bold text-emerald-800 uppercase bg-emerald-50 px-2 py-0.5 rounded">
+                  01 // ПРЕПОДАВАТЕЛЬ
+                </span>
+                <span class="text-[10px] font-mono font-bold text-emerald-600">60–90 сек</span>
+              </div>
+              <div class="mt-2 text-xs">
+                <div class="font-bold text-slate-900">Ввод сразу после урока</div>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+                  Явка в 1 клик, 15 шкал методики и голосовой отчет через микрофон прямо в зале.
+                </p>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span>Интерфейс:</span>
+                <span class="text-slate-700 font-bold">Telegram WebApp</span>
+              </div>
+            </div>
+
+            <!-- Actor 2: Administrator -->
+            <div id="card-actor-admin" class="arch-card bg-white p-3.5 rounded-xl border border-sky-300 shadow-xs hover:border-sky-500">
+              <div class="flex items-center justify-between pb-1.5 border-b border-sky-100">
+                <span class="text-[10px] font-mono font-bold text-sky-800 uppercase bg-sky-50 px-2 py-0.5 rounded">
+                  02 // АДМИНИСТРАТОР
+                </span>
+                <span class="text-[10px] font-mono font-bold text-emerald-600">0 мин копипаста</span>
+              </div>
+              <div class="mt-2 text-xs">
+                <div class="font-bold text-slate-900">Координация до урока</div>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+                  Отметка предупреждений о пропусках, выпуск списков допуска и контроль 24ч дедлайнов сдачи.
+                </p>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span>Интерфейс:</span>
+                <span class="text-slate-700 font-bold">Диспетчерская панель</span>
+              </div>
+            </div>
+
+            <!-- Actor 3: Parents -->
+            <div id="card-actor-parent" class="arch-card bg-white p-3.5 rounded-xl border border-purple-300 shadow-xs hover:border-purple-500">
+              <div class="flex items-center justify-between pb-1.5 border-b border-purple-100">
+                <span class="text-[10px] font-mono font-bold text-purple-800 uppercase bg-purple-50 px-2 py-0.5 rounded">
+                  03 // РОДИТЕЛИ
+                </span>
+                <span class="text-[10px] font-mono font-bold text-purple-700">Воскресенье</span>
+              </div>
+              <div class="mt-2 text-xs">
+                <div class="font-bold text-slate-900">Получение ценности</div>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+                  Регулярный развивающий дайджест в мессенджер: динамика навыков и цели на следующий урок.
+                </p>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span>Интерфейс:</span>
+                <span class="text-slate-700 font-bold">Telegram / WhatsApp</span>
+              </div>
+            </div>
+
+            <!-- Actor 4: Owner / Executive -->
+            <div id="card-actor-maxim" class="arch-card bg-white p-3.5 rounded-xl border border-rose-300 shadow-xs hover:border-rose-500">
+              <div class="flex items-center justify-between pb-1.5 border-b border-rose-100">
+                <span class="text-[10px] font-mono font-bold text-rose-800 uppercase bg-rose-50 px-2 py-0.5 rounded">
+                  04 // СОБСТВЕННИК
+                </span>
+                <span class="text-[10px] font-mono font-bold text-rose-700">В 1 клик</span>
+              </div>
+              <div class="mt-2 text-xs">
+                <div class="font-bold text-slate-900">Стратегический контроль</div>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+                  3 уровня аналитики (школа, педагоги, ученики) и управление методологической базой студии.
+                </p>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span>Интерфейс:</span>
+                <span class="text-slate-700 font-bold">Управленческий пульт</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- ZONE 2: SYSTEM MODULES (CENTER, 6 COLS)                   -->
+        <!-- ========================================================= -->
+        <div class="lg:col-span-6 rounded-2xl bg-indigo-50/40 border-2 border-indigo-500/35 p-4 flex flex-col justify-between space-y-3.5 shadow-xs">
+
+          <!-- Zone 2 Header Badge -->
+          <div class="flex items-center justify-between pb-3 border-b border-indigo-200/70">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 ring-4 ring-indigo-100 animate-pulse"></span>
+              <span class="text-xs font-mono font-extrabold text-indigo-950 uppercase tracking-tight">
+                02. МОДУЛИ ПРОГРАММНОГО КОМПЛЕКСА (РАЗДЕЛ 3 КП)
+              </span>
+            </div>
+            <span class="text-[9px] font-mono font-bold bg-white text-indigo-800 px-2 py-0.5 rounded border border-indigo-200">
+              ЯДРО РАЗРАБОТКИ
+            </span>
+          </div>
+
+          <!-- Core Platform Base Card -->
+          <div id="card-mod-base" class="arch-card bg-white p-3.5 rounded-xl border-2 border-indigo-400 shadow-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                <span class="text-xs font-mono font-bold text-indigo-950 uppercase">БАЗОВАЯ ПЛАТФОРМА (АРХИТЕКТУРНЫЙ КАРКАС)</span>
+              </div>
+              <span class="text-[9px] font-mono font-bold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-200">
+                Server + PostgreSQL + RBAC
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-600 mt-1 leading-snug font-sans">
+              Серверное ядро, защищенная база данных, шина событий, сессионная авторизация в Telegram и отказоустойчивый офлайн-кэш при падении сети в залах.
+            </p>
+          </div>
+
+          <!-- 4 Specific Modules Grid (2x2) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            
+            <!-- Module 1 -->
+            <div id="card-mod-1" class="arch-card bg-white p-3 rounded-xl border border-slate-200 hover:border-emerald-400 shadow-xs">
+              <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                <span class="text-[10px] font-mono font-bold text-emerald-800">МОДУЛЬ 1</span>
+                <span class="text-[9px] font-mono bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded">Ввод</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 mt-1.5">Экспресс-терминал педагога</div>
+              <p class="text-[10px] text-slate-500 mt-1 leading-tight">
+                Telegram WebApp: 15 шкал методики, распознавание речи voice-to-text, валидация полей за 60 секунд.
+              </p>
+            </div>
+
+            <!-- Module 2 -->
+            <div id="card-mod-2" class="arch-card bg-white p-3 rounded-xl border border-slate-200 hover:border-sky-400 shadow-xs">
+              <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                <span class="text-[10px] font-mono font-bold text-sky-800">МОДУЛЬ 2</span>
+                <span class="text-[9px] font-mono bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded">Операционка</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 mt-1.5">Диспетчерская и CRM-шлюз</div>
+              <p class="text-[10px] text-slate-500 mt-1 leading-tight">
+                Двусторонний API-мост к «Мой класс» (автосписание уроков) и диспетчерская списков групп для админа.
+              </p>
+            </div>
+
+            <!-- Module 3 -->
+            <div id="card-mod-3" class="arch-card bg-white p-3 rounded-xl border border-slate-200 hover:border-purple-400 shadow-xs">
+              <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                <span class="text-[10px] font-mono font-bold text-purple-800">МОДУЛЬ 3</span>
+                <span class="text-[9px] font-mono bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">Удержание LTV</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 mt-1.5">Сервис клиентской отчетности</div>
+              <p class="text-[10px] text-slate-500 mt-1 leading-tight">
+                LLM-синтез развивающих дайджестов из 15 шкал и аудио. Воскресная авторассылка в мессенджеры.
+              </p>
+            </div>
+
+            <!-- Module 4 -->
+            <div id="card-mod-4" class="arch-card bg-white p-3 rounded-xl border border-slate-200 hover:border-rose-400 shadow-xs">
+              <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                <span class="text-[10px] font-mono font-bold text-rose-800">МОДУЛЬ 4</span>
+                <span class="text-[9px] font-mono bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded">Аналитика</span>
+              </div>
+              <div class="text-xs font-bold text-slate-900 mt-1.5">Аналитический пульт (3 уровня)</div>
+              <p class="text-[10px] text-slate-500 mt-1 leading-tight">
+                1) Школа (отток/удержание); 2) Педагоги (аудит копипаста); 3) Ученики (динамика 15 шкал).
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Module 5 (Full width in center bottom) -->
+          <div id="card-mod-5" class="arch-card bg-white p-3 rounded-xl border border-slate-200 hover:border-indigo-400 shadow-xs">
+            <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+              <span class="text-[10px] font-mono font-bold text-indigo-800">МОДУЛЬ 5</span>
+              <span class="text-[9px] font-mono bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded">RAG-индекс</span>
+            </div>
+            <div class="text-xs font-bold text-slate-900 mt-1.5">Корпоративная база знаний и методологический хаб</div>
+            <p class="text-[10px] text-slate-500 mt-1 leading-tight">
+              Векторная база знаний, семантический поиск по сценариям, этюдам и регламентам студии с ролевым доступом.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- ZONE 3: EXTERNAL DESTINATIONS (RIGHT, 3 COLS)             -->
+        <!-- ========================================================= -->
+        <div class="lg:col-span-3 rounded-2xl bg-purple-50/30 border-2 border-purple-500/25 p-4 flex flex-col justify-between space-y-4">
+          
+          <!-- Zone 3 Header Badge -->
+          <div class="flex items-center justify-between pb-3 border-b border-purple-200/60">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-500 ring-4 ring-purple-100"></span>
+              <span class="text-xs font-mono font-extrabold text-purple-950 uppercase tracking-tight">03. ВНЕШНИЕ СИСТЕМЫ</span>
+            </div>
+            <span class="text-[9px] font-mono font-bold bg-white text-purple-800 px-2 py-0.5 rounded border border-purple-200">
+              ЭНДПОИНТЫ
+            </span>
+          </div>
+
+          <!-- Destinations Stack -->
+          <div class="flex flex-col space-y-3.5 flex-1 justify-between">
+            
+            <!-- Target 1: CRM My Class -->
+            <div id="card-target-crm" class="arch-card bg-white p-3.5 rounded-xl border border-amber-300 shadow-xs hover:border-amber-500">
+              <div class="flex items-center justify-between pb-1.5 border-b border-amber-100">
+                <span class="text-[10px] font-mono font-bold text-amber-800 uppercase bg-amber-50 px-2 py-0.5 rounded">
+                  CRM «МОЙ КЛАСС»
+                </span>
+                <span class="text-[10px] font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                  100% Авто
+                </span>
+              </div>
+              <div class="mt-2 text-xs">
+                <div class="font-bold text-slate-900">Списание абонемента</div>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+                  Урок мгновенно списывается с баланса ученика по закрытию отчета без ручного участия администратора.
+                </p>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span>Протокол:</span>
+                <span class="text-slate-700 font-bold">API Integration</span>
+              </div>
+            </div>
+
+            <!-- Target 2: Messenger Gateway -->
+            <div id="card-target-msg" class="arch-card bg-white p-3.5 rounded-xl border border-purple-300 shadow-xs hover:border-purple-500">
+              <div class="flex items-center justify-between pb-1.5 border-b border-purple-100">
+                <span class="text-[10px] font-mono font-bold text-purple-800 uppercase bg-purple-50 px-2 py-0.5 rounded">
+                  ШЛЮЗ МЕССЕНДЖЕРОВ
+                </span>
+                <span class="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">
+                  Вс 18:00
+                </span>
+              </div>
+              <div class="mt-2 text-xs">
+                <div class="font-bold text-slate-900">Доставка в чаты</div>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+                  Прямая доставка персонализированных развивающих отчетов в личные чаты родителей каждую неделю.
+                </p>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span>Каналы:</span>
+                <span class="text-slate-700 font-bold">Telegram / WhatsApp</span>
+              </div>
+            </div>
+
+            <!-- Target 3: Executive BI Screen -->
+            <div id="card-target-bi" class="arch-card bg-white p-3.5 rounded-xl border border-rose-300 shadow-xs hover:border-rose-500">
+              <div class="flex items-center justify-between pb-1.5 border-b border-rose-100">
+                <span class="text-[10px] font-mono font-bold text-rose-800 uppercase bg-rose-50 px-2 py-0.5 rounded">
+                  ЭКРАН УПРАВЛЕНИЯ
+                </span>
+                <span class="text-[10px] font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                  Защита LTV
+                </span>
+              </div>
+              <div class="mt-2 text-xs">
+                <div class="font-bold text-slate-900">Принятие решений</div>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">
+                  Обоснованный перевод между группами, аудит преподавателей и превентивное предотвращение оттока.
+                </p>
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <span>Срез:</span>
+                <span class="text-slate-700 font-bold">100 → 250+ учеников</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DYNAMIC ACTOR SCENARIO COMMENTARY BAR (MOVED TO BOTTOM AS REQUESTED) -->
+    <div id="actor-scenario-box" class="bg-white border-2 border-indigo-200 rounded-2xl p-5 shadow-xs transition-all duration-300">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+        <div class="flex items-center gap-2.5">
+          <span id="scenario-badge-icon" class="w-3 h-3 rounded-full bg-indigo-600"></span>
+          <span id="scenario-title" class="font-mono font-extrabold text-xs sm:text-sm text-slate-900 uppercase tracking-tight">
+            СКВОЗНАЯ СХЕМА: ВСЕ ВЗАИМОДЕЙСТВИЯ СИСТЕМЫ
+          </span>
+        </div>
+        <span id="scenario-metric" class="text-xs font-mono font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-200 self-start sm:self-auto">
+          6 модулей • 4 актора • 3 внешних шлюза
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mt-3 text-xs">
+        <div class="md:col-span-8 space-y-1.5">
+          <span class="font-mono text-[10px] uppercase font-bold text-slate-400 block" id="scenario-flow-label">ЛОГИСТИКА И ТРАНСФОРМАЦИЯ ДАННЫХ:</span>
+          <p class="text-slate-700 text-xs sm:text-sm leading-relaxed" id="scenario-desc">
+            Данные вводятся преподавателем со смартфона в зале за 60 секунд. Базовая платформа автоматически разделяет единый пакет: статус явки списывает урок в CRM «Мой класс», числовые шкалы и аудиозапись преобразуются в воскресный развивающий дайджест родителям, а агрегированный срез поступает на управленческий пульт собственника.
+          </p>
+        </div>
+
+        <div class="md:col-span-4 p-3 rounded-xl bg-slate-50 border border-slate-200/80 font-mono text-[11px] space-y-1.5 flex flex-col justify-center">
+          <div class="flex items-center justify-between text-slate-500">
+            <span>Задействованы:</span>
+            <span class="font-bold text-slate-800" id="scenario-mods-active">Все модули 1–5</span>
+          </div>
+          <div class="flex items-center justify-between text-slate-500">
+            <span>Твердый результат:</span>
+            <span class="font-bold text-emerald-700" id="scenario-result">Полный суверенитет данных</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Clean Light Footer -->
+  <footer class="border-t border-slate-200 bg-white py-3 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-slate-400 gap-1.5">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span class="text-slate-700 font-bold">ПАК «ТЕАТРАЛЬНАЯ СТУДИЯ»</span>
+        <span>•</span>
+        <span>ИНТЕРАКТИВНАЯ БЛОК-СХЕМА К КП</span>
+      </div>
+      <div>
+        <span>РЕДАКЦИЯ // ОКТЯБРЬ 2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SVG Arrow Calculation & Interactive Logic Controller -->
+  <script>
+    // Definition of actor scenarios and data flows
+    const actorData = {
+      all: {
+        title: "СКВОЗНАЯ СХЕМА: ВСЕ ВЗАИМОДЕЙСТВИЯ СИСТЕМЫ",
+        badge: "6 модулей • 4 актора • 3 внешних шлюза",
+        desc: "Данные вводятся преподавателем со смартфона в зале за 60 секунд. Базовая платформа автоматически разделяет единый пакет: статус явки списывает урок в CRM «Мой класс», числовые шкалы и аудиозапись преобразуются в воскресный развивающий дайджест родителям, а агрегированный срез поступает на управленческий пульт собственника.",
+        mods: "Все модули 1–5",
+        result: "Полный суверенитет данных",
+        color: "#4f46e5",
+        activeActors: ["card-actor-teacher", "card-actor-admin", "card-actor-parent", "card-actor-maxim"],
+        activeModules: ["card-mod-base", "card-mod-1", "card-mod-2", "card-mod-3", "card-mod-4", "card-mod-5"],
+        activeTargets: ["card-target-crm", "card-target-msg", "card-target-bi"],
+        links: [
+          { from: "card-actor-teacher", to: "card-mod-1", color: "#10b981", marker: "arrowhead-emerald" },
+          { from: "card-mod-1", to: "card-mod-base", color: "#10b981", marker: "arrowhead-emerald" },
+          { from: "card-actor-admin", to: "card-mod-2", color: "#0284c7", marker: "arrowhead-sky" },
+          { from: "card-mod-2", to: "card-target-crm", color: "#f59e0b", marker: "arrowhead-amber" },
+          { from: "card-mod-base", to: "card-mod-3", color: "#8b5cf6", marker: "arrowhead-purple" },
+          { from: "card-mod-3", to: "card-target-msg", color: "#8b5cf6", marker: "arrowhead-purple" },
+          { from: "card-target-msg", to: "card-actor-parent", color: "#8b5cf6", marker: "arrowhead-purple" },
+          { from: "card-mod-base", to: "card-mod-4", color: "#e11d48", marker: "arrowhead-rose" },
+          { from: "card-mod-4", to: "card-target-bi", color: "#e11d48", marker: "arrowhead-rose" },
+          { from: "card-actor-maxim", to: "card-mod-4", color: "#e11d48", marker: "arrowhead-rose" },
+          { from: "card-actor-maxim", to: "card-mod-5", color: "#4f46e5", marker: "arrowhead-indigo" }
+        ]
+      },
+      teacher: {
+        title: "СЦЕНАРИЙ АКТОРА 01 // ПРЕПОДАВАТЕЛЬ (ВВОД ДАННЫХ В ЗАЛЕ)",
+        badge: "60–90 сек • 0 таблиц дома",
+        desc: "Преподаватель открывает Telegram WebApp на телефоне сразу после урока. В 1 касание отмечает явку ('был/не был'), выставляет 15 параметров методики ползунками (шкала 4-10) и надиктовывает комментарий голосом через встроенную кнопку записи. Нажимает 'Отправить'. Регламент сдачи 24ч закрывается прямо в зале.",
+        mods: "Модуль 1 (Терминал) + Базовая платформа",
+        result: "Дедлайн закрыт в зале",
+        color: "#10b981",
+        activeActors: ["card-actor-teacher"],
+        activeModules: ["card-mod-1", "card-mod-base"],
+        activeTargets: ["card-target-crm"],
+        links: [
+          { from: "card-actor-teacher", to: "card-mod-1", color: "#10b981", marker: "arrowhead-emerald" },
+          { from: "card-mod-1", to: "card-mod-base", color: "#10b981", marker: "arrowhead-emerald" },
+          { from: "card-mod-base", to: "card-target-crm", color: "#f59e0b", marker: "arrowhead-amber" }
+        ]
+      },
+      admin: {
+        title: "СЦЕНАРИЙ АКТОРА 02 // АДМИНИСТРАТОР (ОПЕРАЦИОННЫЙ КОНТРОЛЬ)",
+        badge: "0 мин копипаста • 100% автосписание",
+        desc: "Администратор вносит отметки предупреждений о пропусках — система формирует готовый список допуска педагогу до урока. В момент сдачи отчета педагогом модуль автоматически списывает урок в CRM «Мой класс» (статус 0/1). Администраторы больше не переносят ни единого балла вручную.",
+        mods: "Модуль 2 (Диспетчерская и CRM) + Базовая платформа",
+        result: "Высвобождение 80–100ч в месяц",
+        color: "#0284c7",
+        activeActors: ["card-actor-admin"],
+        activeModules: ["card-mod-2", "card-mod-base"],
+        activeTargets: ["card-target-crm"],
+        links: [
+          { from: "card-actor-admin", to: "card-mod-2", color: "#0284c7", marker: "arrowhead-sky" },
+          { from: "card-mod-2", to: "card-mod-base", color: "#0284c7", marker: "arrowhead-sky" },
+          { from: "card-mod-2", to: "card-target-crm", color: "#f59e0b", marker: "arrowhead-amber" }
+        ]
+      },
+      parent: {
+        title: "СЦЕНАРИЙ АКТОРА 03 // РОДИТЕЛИ (ОТЧЕТЫ И УДЕРЖАНИЕ LTV)",
+        badge: "Каждое воскресенье • Защита LTV",
+        desc: "Родитель больше не находится в полугодовом информационном вакууме. Каждое воскресенье система через сервис клиентской отчетности синтезирует из 15 параметров и комментариев развивающий текст и доставляет его в Telegram/WhatsApp. Осязаемая ценность абонемента подтверждается еженедельно.",
+        mods: "Модуль 3 (Клиентская отчетность) + Базовая платформа",
+        result: "Снижение оттока на 20–30%",
+        color: "#8b5cf6",
+        activeActors: ["card-actor-parent"],
+        activeModules: ["card-mod-3", "card-mod-base"],
+        activeTargets: ["card-target-msg"],
+        links: [
+          { from: "card-mod-base", to: "card-mod-3", color: "#8b5cf6", marker: "arrowhead-purple" },
+          { from: "card-mod-3", to: "card-target-msg", color: "#8b5cf6", marker: "arrowhead-purple" },
+          { from: "card-target-msg", to: "card-actor-parent", color: "#8b5cf6", marker: "arrowhead-purple" }
+        ]
+      },
+      maxim: {
+        title: "СЦЕНАРИЙ АКТОРА 04 // СОБСТВЕННИК (ПУЛЬТ УПРАВЛЕНИЯ И RAG-ХАБ)",
+        badge: "3 уровня в 1 клик • База знаний",
+        desc: "Собственник видит студию на 3 уровнях: 1) Школа (динамика базы 100→250+, Churn); 2) Педагоги (аудит соблюдения 24ч дедлайнов и алгоритмический фильтр шаблонности); 3) Ученики (карты 15 параметров для перевода в старшие группы). Плюс быстрый семантический поиск по пьесам и регламентам в RAG-базе знаний.",
+        mods: "Модуль 4 (Аналитика) + Модуль 5 (База знаний)",
+        result: "Снятие когнитивной перегрузки ЛПР",
+        color: "#e11d48",
+        activeActors: ["card-actor-maxim"],
+        activeModules: ["card-mod-4", "card-mod-5", "card-mod-base"],
+        activeTargets: ["card-target-bi"],
+        links: [
+          { from: "card-actor-maxim", to: "card-mod-4", color: "#e11d48", marker: "arrowhead-rose" },
+          { from: "card-actor-maxim", to: "card-mod-5", color: "#4f46e5", marker: "arrowhead-indigo" },
+          { from: "card-mod-base", to: "card-mod-4", color: "#e11d48", marker: "arrowhead-rose" },
+          { from: "card-mod-4", to: "card-target-bi", color: "#e11d48", marker: "arrowhead-rose" }
+        ]
+      }
+    };
+
+    // Render interactive SVG connections between HTML cards
+    function drawConnections(activeLinks, isAll) {
+      const svgGroup = document.getElementById('svg-paths-group');
+      const container = document.getElementById('diagram-container');
+      if (!svgGroup || !container) return;
+
+      const cRect = container.getBoundingClientRect();
+      svgGroup.innerHTML = '';
+
+      // Only draw SVG lines on desktop screens where columns are horizontal
+      if (window.innerWidth < 1024) return;
+
+      activeLinks.forEach(link => {
+        const fromEl = document.getElementById(link.from);
+        const toEl = document.getElementById(link.to);
+        if (!fromEl || !toEl) return;
+
+        const fRect = fromEl.getBoundingClientRect();
+        const tRect = toEl.getBoundingClientRect();
+
+        // Calculate anchors relative to container
+        let startX, startY, endX, endY;
+
+        if (fRect.right <= tRect.left + 25) {
+          // Flow from Left to Right
+          startX = fRect.right - cRect.left;
+          startY = (fRect.top + fRect.bottom) / 2 - cRect.top;
+          endX = tRect.left - cRect.left;
+          endY = (tRect.top + tRect.bottom) / 2 - cRect.top;
+        } else if (fRect.left >= tRect.right - 25) {
+          // Flow from Right to Left (Feedback loops)
+          startX = fRect.left - cRect.left;
+          startY = (fRect.top + fRect.bottom) / 2 - cRect.top;
+          endX = tRect.right - cRect.left;
+          endY = (tRect.top + tRect.bottom) / 2 - cRect.top;
+        } else {
+          // Vertical or close flow
+          startX = (fRect.left + fRect.right) / 2 - cRect.left;
+          startY = fRect.bottom - cRect.top;
+          endX = (tRect.left + tRect.right) / 2 - cRect.left;
+          endY = tRect.top - cRect.top;
+        }
+
+        // Generate smooth Bezier curve path
+        const dx = Math.abs(endX - startX) * 0.45;
+        const d = `M ${startX} ${startY} C ${startX + (endX > startX ? dx : -dx)} ${startY}, ${endX - (endX > startX ? dx : -dx)} ${endY}, ${endX} ${endY}`;
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", d);
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", link.color);
+        path.setAttribute("stroke-width", isAll ? "2" : "3");
+        path.setAttribute("marker-end", `url(#${link.marker})`);
+        path.classList.add("arrow-line");
+        if (!isAll) {
+          path.classList.add("arrow-active");
+        }
+        svgGroup.appendChild(path);
+      });
+    }
+
+    // Controller to switch active actor routes via top buttons
+    let currentActorRoute = 'all';
+
+    function setActorRoute(actorKey) {
+      currentActorRoute = actorKey;
+      const data = actorData[actorKey] || actorData.all;
+
+      // Update button styles
+      document.querySelectorAll('.actor-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-xs');
+        btn.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+      });
+      const activeBtn = document.getElementById('btn-actor-' + actorKey);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-xs');
+      }
+
+      // Collect all cards
+      const allCards = document.querySelectorAll('.arch-card');
+
+      if (actorKey === 'all') {
+        allCards.forEach(c => {
+          c.classList.remove('dimmed', 'active-focus');
+        });
+      } else {
+        const allowedIds = new Set([...data.activeActors, ...data.activeModules, ...data.activeTargets]);
+        allCards.forEach(c => {
+          if (allowedIds.has(c.id)) {
+            c.classList.remove('dimmed');
+            c.classList.add('active-focus');
+          } else {
+            c.classList.add('dimmed');
+            c.classList.remove('active-focus');
+          }
+        });
+      }
+
+      // Update bottom scenario description
+      document.getElementById('scenario-title').innerText = data.title;
+      document.getElementById('scenario-metric').innerText = data.badge;
+      document.getElementById('scenario-desc').innerText = data.desc;
+      document.getElementById('scenario-mods-active').innerText = data.mods;
+      document.getElementById('scenario-result').innerText = data.result;
+      document.getElementById('scenario-badge-icon').style.backgroundColor = data.color;
+
+      // Redraw SVG arrows
+      drawConnections(data.links, actorKey === 'all');
+    }
+
+    // Dismiss mobile gatekeeper if forced by user
+    function dismissMobileGatekeeper() {
+      const gatekeeper = document.getElementById('mobile-gatekeeper');
+      if (gatekeeper) {
+        gatekeeper.style.display = 'none';
+      }
+      setTimeout(() => {
+        drawConnections(actorData[currentActorRoute].links, currentActorRoute === 'all');
+      }, 100);
+    }
+
+    // Auto-recalculate SVG paths on resize
+    window.addEventListener('resize', () => {
+      setActorRoute(currentActorRoute);
+    });
+
+    // Initial render
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        setActorRoute('all');
+      }, 150);
+    });
+  </script>
+</body>
+</html>
